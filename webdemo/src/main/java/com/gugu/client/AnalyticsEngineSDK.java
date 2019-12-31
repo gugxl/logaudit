@@ -1,5 +1,10 @@
 package com.gugu.client;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -17,5 +22,110 @@ public class AnalyticsEngineSDK {
     private static final String sdkName = "jdk";
     private static final String version = "1";
 
-//    public static boolea
+    /**
+     * @Description 触发订单支付成功事件，发送事件数据到服务器
+     * @params
+     * @param orderId 订单支付id
+     * @param memberId 订单支付会员id
+     * @return boolean 如果发送数据成功(加入到发送队列中)，那么返回true；否则返回false(参数异常&添加到发送队列失败).
+     * @auther gugu
+     */
+    
+    public static boolean onChargeSuccess(String orderId, String memberId){
+        if (isEmpty(orderId) || isEmpty(memberId)){
+            // 订单id或者memberid为空
+            logger.log(Level.WARNING,"订单id和会员id不能为空");
+            return false;
+        }
+//        代码执行到这儿，表示订单id和会员id都不为空。
+        Map<String,String> data = new HashMap<String,String>();
+        data.put("u_mid", memberId);
+        data.put("oid", orderId);
+        data.put("c_time", String.valueOf(System.currentTimeMillis()));
+        data.put("ver", version);
+        data.put("en", "e_cs");
+        data.put("pl", platformName);
+        data.put("sdk", sdkName);
+
+        try {
+            // 创建url
+            String url = buildUrl(data);
+            // 发送url&将url加入到队列
+            SendDataMonitor.addSendUrl(url);
+            return true;
+        } catch (Throwable e) {
+            logger.log(Level.WARNING, "发送数据异常", e);
+        }
+        return false;
+    }
+    public static boolean onChargeRefund(String orderId, String memberId){
+        if (isEmpty(orderId) || isEmpty(memberId)){
+            // 订单id或者memberid为空
+            logger.log(Level.WARNING,"订单id和会员id不能为空");
+            return false;
+        }
+        // 代码执行到这儿，表示订单id和会员id都不为空。
+        Map<String, String> data = new HashMap<String, String>();
+        data.put("u_mid", memberId);
+        data.put("oid", orderId);
+        data.put("c_time", String.valueOf(System.currentTimeMillis()));
+        data.put("ver", version);
+        data.put("en", "e_cr");
+        data.put("pl", platformName);
+        data.put("sdk", sdkName);
+        // 构建url
+        try {
+            // 构建url
+            String url = buildUrl(data);
+            // 发送url&将url添加到队列中
+            SendDataMonitor.addSendUrl(url);
+            return true;
+        } catch (Throwable e) {
+            logger.log(Level.WARNING, "发送数据异常", e);
+        }
+        return false;
+    }
+    /**
+     * @Description 根据传入的参数构建url
+     * @params 
+     * @param data
+     * @return java.lang.String
+     * @auther gugu
+     */
+    
+    private static String buildUrl(Map<String, String> data) throws UnsupportedEncodingException {
+        StringBuilder sb = new StringBuilder();
+        sb.append(accessUrl).append("?");
+        for (Map.Entry<String,String> entry : data.entrySet()){
+            if (isNotEmpty(entry.getKey()) && isNotEmpty((entry.getValue()))){
+                sb.append(entry.getKey().trim())
+                        .append("=")
+                        .append(URLEncoder.encode(entry.getValue().trim(),"utf-8"))
+                        .append("&");
+            }
+        }
+        return sb.substring(0,sb.length()-1);// 去掉最后&
+    }
+    /**
+     * @Description 判断字符串是否为空，如果为空，返回true。否则返回false。
+     * @params 
+     * @param value
+     * @return boolean
+     * @auther gugu
+     */
+    
+    public static boolean isEmpty(String value){
+        return null == value || value.trim().isEmpty();
+    }
+    /**
+     * @Description 判断字符串是否非空，如果不是空，返回true。如果是空，返回false。
+     * @params
+     * @param value
+     * @return boolean
+     * @auther gugu
+     */
+
+    public static boolean isNotEmpty(String value){
+        return !isEmpty(value);
+    }
 }
