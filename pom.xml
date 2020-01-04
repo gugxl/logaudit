@@ -8,6 +8,12 @@
     <artifactId>logAudit</artifactId>
     <properties>
         <flume.version>1.5.2</flume.version>
+        <hadoop.version>2.7.3</hadoop.version>
+        <commons-cli.version>1.2</commons-cli.version>
+        <junit.version>4.12</junit.version>
+        <zookeeper.version>3.4.6</zookeeper.version>
+        <hbase.version>2.2.2</hbase.version>
+
     </properties>
 
     <packaging>pom</packaging>
@@ -16,6 +22,7 @@
 
     <modules>
         <module>webdemo</module>
+        <module>logetl</module>
     </modules>
 
 

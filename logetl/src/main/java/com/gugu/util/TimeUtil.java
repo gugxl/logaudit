@@ -1,0 +1,120 @@
+package com.gugu.util;
+
+import com.gugu.common.DateEnum;
+import org.apache.commons.lang.StringUtils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ * @author gugu
+ * @Classname TimeUtil
+ * @Description 时间控制工具类
+ * @Date 2020/1/2 20:27
+ */
+public class TimeUtil {
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
+
+    //    获取昨日的日期格式字符串数据
+    public static String getYesterday() {
+        return getYesterday(DATE_FORMAT);
+    }
+
+    //    获取对应格式的时间字符串
+    public static String getYesterday(String pattern) {
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.DAY_OF_YEAR, -1);
+        return sdf.format(calendar.getTime());
+    }
+
+    // 判断输入的参数是否是一个有效的时间格式数据
+    public static boolean isValidateRunningDate(String input) {
+        Matcher matcher = null;
+        boolean result = false;
+        String regex = "[0-9]{4}-[0-9]{2}-[0-9]{2}";
+        if (input != null && !input.isEmpty()) {
+            Pattern pattern = Pattern.compile(regex);
+            matcher = pattern.matcher(input);
+        }
+        if (matcher != null) {
+            result = matcher.matches();
+        }
+        return result;
+    }
+//    将yyyy-MM-dd格式的时间字符串转换为时间戳
+    public static long parseString2Long(String input) {
+        return parseString2Long(input, DATE_FORMAT);
+    }
+//    将指定格式的时间字符串转换为时间戳
+    public static long parseString2Long(String input, String pattern) {
+        Date date = null;
+        try {
+            date = new SimpleDateFormat(pattern).parse(input);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
+        return date.getTime();
+    }
+//将时间戳转换为指定格式的字符串
+    public static String parseLong2String(Long input){
+        return parseLong2String(input, DATE_FORMAT);
+    }
+    //将时间戳转换为指定格式的字符串
+    public static String parseLong2String(Long input,String pattern) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(input);
+        return new SimpleDateFormat(pattern).format(calendar.getTime());
+    }
+//    将nginx服务器时间转换为时间戳，如果说解析失败，返回-1
+    public static long parseNginxServerTime2Long(String input){
+        Date date = parseNginxServerTime2Date(input);
+        return date == null ? -1L : date.getTime();
+    }
+//    将nginx服务器时间转换为date对象。如果解析失败，返回null
+    public static Date parseNginxServerTime2Date(String input) {
+        if (StringUtils.isEmpty(input)){
+            long timestamp = Double.valueOf(Double.valueOf(input.trim()) * 1000).longValue();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(timestamp);
+            return calendar.getTime();
+        }
+        return null;
+    }
+
+    public static int getDateInfo(long time, DateEnum type){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        switch (type){
+            case YEAR:
+                // 需要年份信息
+                return calendar.get(Calendar.YEAR);
+            case SEASON:// 需要季度信息
+                return calendar.get(Calendar.SECOND);
+            case MONTH:// 需要月份信息
+                return calendar.get(Calendar.MONTH);
+            case WEEK:  // 需要周信息
+                return calendar.get(Calendar.WEEK_OF_YEAR);
+            case DAY:  // 需要日信息
+                return calendar.get(Calendar.DAY_OF_MONTH);
+            case HOUR:  // 需要日信息
+                return calendar.get(Calendar.HOUR_OF_DAY);
+        }
+        throw new RuntimeException("没有对应的时间类型:" + type);
+    }
+
+    public static long getFirstDayOfThisWeek(long time){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(time);
+        calendar.set(Calendar.DAY_OF_WEEK, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        return calendar.getTimeInMillis();
+    }
+}
