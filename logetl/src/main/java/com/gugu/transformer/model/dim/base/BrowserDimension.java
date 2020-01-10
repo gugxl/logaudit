@@ -50,7 +50,7 @@ public class BrowserDimension extends BaseDimension {
      * @auther gugu
      */
 
-    public List<BrowserDimension> buildList(String browserName, String browserVersion){
+    public static List<BrowserDimension> buildList(String browserName, String browserVersion){
         List<BrowserDimension> list = new ArrayList<BrowserDimension>();
         if (StringUtils.isBlank(browserName)){
             // 浏览器名称为空，那么设置为unknown

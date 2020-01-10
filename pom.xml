@@ -13,7 +13,9 @@
         <junit.version>4.12</junit.version>
         <zookeeper.version>3.4.6</zookeeper.version>
         <hbase.version>2.2.2</hbase.version>
-
+        <hive-jdbc.version>1.2.1</hive-jdbc.version>
+        <hive.version>1.2.1</hive.version>
+        <hive-exec.version>1.2.1.spark2</hive-exec.version>
     </properties>
 
     <packaging>pom</packaging>
